@@ -223,13 +223,18 @@ round.standard <- function(x) {
     floor(x + sign(x) * 0.5)
 }
 
-round.with.warn <- function(x, f=round.standard, name=NULL) {
-    rounded <- f(x)
-    if(x > 0 && rounded == 0) {
-        warning(paste("truncating", ifelse(is.null(name), "a", name), "non-zero value of", x, "to 0"))
+round.with.warn <- function(x, f=round, name=NULL) {
+  rounded <- f(x)
+  # Apply the warning check to each element if x is a vector
+  if(any(x > 0 & rounded == 0)) {
+    warning_indices <- which(x > 0 & rounded == 0)
+    for(i in warning_indices) {
+      warning(paste("Truncating", ifelse(is.null(name), "a", name), "non-zero value of", x[i], "to 0"))
     }
-    rounded
+  }
+  rounded
 }
+
 
 naturalfreq <- function(ar, denominator=100) {
     numerator <- ar
